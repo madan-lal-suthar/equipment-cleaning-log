@@ -1,0 +1,449 @@
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --border: #dfe3e8;
+  --text: #1c2530;
+  --muted: #6b7684;
+  --accent: #2f5bea;
+  --danger: #c0392b;
+  --pending: #b7791f;
+  --verified: #237a4b;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.app__header h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.app__body {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .app__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.panel--nested {
+  margin-top: 16px;
+  background: #fbfcfe;
+}
+
+.panel--empty {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+}
+
+.panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel__head h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+h3 {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 2px 0;
+  font-size: 13px;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+button {
+  font: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.link {
+  border: none;
+  background: none;
+  color: var(--accent);
+  padding: 4px 6px;
+}
+
+button.secondary {
+  color: var(--muted);
+}
+
+button.link--danger {
+  color: var(--danger);
+}
+
+button.danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: inherit;
+  width: 100%;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  background: #fbfcfe;
+}
+
+.form label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.form--inline {
+  grid-template-columns: 1fr 1fr auto;
+  /* `start`, not `center`: a field error grows one column, and centring would
+     drag the other input and the button out of line with it. */
+  align-items: start;
+}
+
+/* Wraps one input together with its field-level error message. */
+.form__field {
+  display: grid;
+  gap: 4px;
+}
+
+/* A failure with no field of its own spans the whole inline form. */
+.form__error {
+  grid-column: 1 / -1;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.form__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.equipment-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+/*
+ * Each item is a card, not a single flex line. The panel is narrow and names
+ * are arbitrarily long, so anything that puts the name, the code, the badge and
+ * three actions on one row wraps differently per item and the list stops being
+ * scannable. Fixed rows inside the card keep every item the same shape.
+ */
+.equipment-items li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.equipment-items li:has(.equipment-item.is-selected) {
+  border-color: var(--accent);
+}
+
+.equipment-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'name badge'
+    'code badge';
+  gap: 2px 8px;
+  align-items: center;
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+/* The generic button hover recolours text, which on a card this size turns the
+   whole name blue. A background tint says "clickable" without the repaint. */
+.equipment-item:hover {
+  color: inherit;
+  background: #f4f6fb;
+}
+
+.equipment-item.is-selected,
+.equipment-item.is-selected:hover {
+  background: #eef2fe;
+}
+
+.equipment-item__name {
+  grid-area: name;
+  font-weight: 600;
+  /* Long names wrap inside their own cell instead of shoving the badge out. */
+  overflow-wrap: anywhere;
+}
+
+.equipment-item__code {
+  grid-area: code;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.equipment-item .badge {
+  grid-area: badge;
+  justify-self: end;
+}
+
+/* The actions sit on their own strip, so they line up down the whole list. */
+.equipment-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  border-top: 1px solid var(--border);
+  background: #fbfcfe;
+}
+
+/* The edit form stands in for the row, so it fills the card. */
+.equipment-items li > .form {
+  margin-bottom: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.confirm {
+  padding: 10px 12px;
+  border-top: 1px solid var(--danger);
+  background: #fdf3f2;
+}
+
+.confirm p {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef0f3;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.badge--active,
+.badge--verified {
+  background: #e4f4ea;
+  color: var(--verified);
+}
+
+.badge--retired {
+  background: #f1f2f4;
+}
+
+.badge--pending {
+  background: #fdf3e0;
+  color: var(--pending);
+}
+
+.badge--create {
+  background: #e7edfd;
+  color: var(--accent);
+}
+
+.badge--update {
+  background: #fdf3e0;
+  color: var(--pending);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.notes-cell {
+  max-width: 220px;
+  color: var(--muted);
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.user-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.user-picker select {
+  width: auto;
+}
+
+.audit-trail {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.audit-entry {
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+}
+
+.audit-entry__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.audit-changes {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.audit-changes li {
+  display: grid;
+  grid-template-columns: 110px 1fr auto 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.audit-changes__field {
+  color: var(--muted);
+}
+
+.audit-changes__from {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.audit-changes__to {
+  font-weight: 600;
+}
+
+.audit-changes__arrow {
+  color: var(--muted);
+}

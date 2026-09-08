@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cleaning_log_db
+    environment:
+      POSTGRES_USER: cleaning
+      POSTGRES_PASSWORD: cleaning
+      POSTGRES_DB: cleaning_log
+    ports:
+      - '5433:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cleaning -d cleaning_log']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # api and web run straight from the stock Node image — there is no Dockerfile
+  # to build. Each mounts its own workspace and installs on start.
+  #
+  # The `*_modules` volumes are not optional: without them the bind mount would
+  # overlay the host's node_modules into an Alpine container, and `npm ci` would
+  # then write Linux builds back into the host directory, breaking `npm run dev`
+  # on the machine. Keeping node_modules in a named volume isolates the two.
+  api:
+    image: node:22-alpine
+    container_name: cleaning_log_api
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgres://cleaning:cleaning@db:5432/cleaning_log
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - '4000:4000'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_modules:/app/node_modules
+    # Migrate and seed on boot so `docker compose up` gives a working demo.
+    command: sh -c "npm ci && npm run db:migrate && npm run db:seed && npm run dev"
+
+  web:
+    image: node:22-alpine
+    container_name: cleaning_log_web
+    working_dir: /app
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - '5173:5173'
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - frontend_modules:/app/node_modules
+    # --host binds Vite to 0.0.0.0; the container default of localhost would not
+    # be reachable through the published port.
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  db_data:
+  backend_modules:
+  frontend_modules:
